@@ -1,6 +1,6 @@
-# CIDER: Category-Guided Intent Disentanglement for Accurate Personalized News Recommendations
-## The overview of CIDER
-![The overview of CIDER](./assets/cider_overview.png)
+# [KDD'24] CROWN: A Novel Approach to Comprehending Users' Preferences for Accurate Personalized News Recommendation
+## The overview of CROWN
+![The overview of CROWN](./assets/crown_overview.png)
 
 ## Datasets
 1. MIND: [**link**](https://msnews.github.io/)
@@ -21,5 +21,5 @@ sklearn
 
 ## How to run
 ```
-python3 main.py --news_encoder=CIDER --user_encoder=CIDER
+python3 main.py --news_encoder=CROWN --user_encoder=CROWN
 ```
