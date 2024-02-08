@@ -68,10 +68,10 @@ class NewsEncoder(nn.Module):
         news_representation = torch.cat([news_representation, self.dropout(category_representation), self.dropout(subCategory_representation)], dim=2) # [batch_size, news_num, news_embedding_dim]
         return news_representation
 
-# Our proposed model: CIDER - news encoder
-class CIDER(NewsEncoder):
+# Our proposed model: CROWN - news encoder
+class CROWN(NewsEncoder):
     def __init__(self, config: Config):
-        super(CIDER, self).__init__(config)
+        super(CROWN, self).__init__(config)
 
         self.max_title_length = config.max_title_length
         self.max_body_length = config.max_abstract_length
@@ -89,7 +89,7 @@ class CIDER(NewsEncoder):
         body_encoder_layers = TransformerEncoderLayer(config.word_embedding_dim, config.head_num, config.feedforward_dim, config.dropout_rate, batch_first=True)   # head_num은 word_embedding_dim을 나눌 수 있어야 함
         self.body_transformer = TransformerEncoder(body_encoder_layers, config.num_layers)
         
-        # ISAB(Induced Set Attention Block) emcoder - 230915
+        # ISAB(Induced Set Attention Block) emcoder
         self.ISAB = ISAB(dim_in = config.word_embedding_dim, 
                          dim_out = config.word_embedding_dim,
                          num_heads = config.isab_num_heads,        # The number of ISAB heads       4,  choices=[2, 4, 8]
@@ -154,24 +154,24 @@ class CIDER(NewsEncoder):
         body_w = self.dropout(self.word_embedding(content_text)).view([batch_news_num, self.max_body_length, self.word_embedding_dim])          # [batch_size * news_num, max_content_length, word_embedding_dim]
         
         # Transformer encoding
-        # title_p = self.title_pos_encoder(title_w)                                                       # [batch_size * news_num, max_title_length, news_embedding_dim]
-        # title_t = self.title_transformer(title_p)                                                       # [batch_size * news_num, max_title_length, news_embedding_dim]
-        # title_embedding = title_t.mean(dim=1).view([batch_size * news_num, self.word_embedding_dim])    # [batch_size * news_num, news_embedding_dim]    
+        title_p = self.title_pos_encoder(title_w)                                                       # [batch_size * news_num, max_title_length, news_embedding_dim]
+        title_t = self.title_transformer(title_p)                                                       # [batch_size * news_num, max_title_length, news_embedding_dim]
+        title_embedding = title_t.mean(dim=1).view([batch_size * news_num, self.word_embedding_dim])    # [batch_size * news_num, news_embedding_dim]    
         
-        # body_p = self.body_pos_encoder(body_w)                                                          # [batch_size * news_num, max_content_length, news_embedding_dim]
-        # body_t = self.body_transformer(body_p)                                                          # [batch_size * news_num, max_content_length, news_embedding_dim]
-        # body_embedding = body_t.mean(dim=1).view([batch_size * news_num, self.word_embedding_dim])      # [batch_size * news_num, news_embedding_dim]   
+        body_p = self.body_pos_encoder(body_w)                                                          # [batch_size * news_num, max_content_length, news_embedding_dim]
+        body_t = self.body_transformer(body_p)                                                          # [batch_size * news_num, max_content_length, news_embedding_dim]
+        body_embedding = body_t.mean(dim=1).view([batch_size * news_num, self.word_embedding_dim])      # [batch_size * news_num, news_embedding_dim]   
         
         # ISAB(Induced Set Attention Block) encoding - 230915
-        title_isab1 = self.dropout(self.ISAB(title_w))                                                      # [batch_size * news_num, max_title_length, news_embedding_dim]
-        title_isab2 = self.dropout(self.ISAB(title_isab1))                                                  # [batch_size * news_num, max_title_length, news_embedding_dim]
-        title_embedding = title_isab2.mean(dim=1).view([batch_news_num, self.word_embedding_dim])           # [batch_size, news_num, news_embedding_dim]
-        # title_embedding = title_isab1.mean(dim=1).view([batch_news_num, self.word_embedding_dim])         
+        # title_isab1 = self.dropout(self.ISAB(title_w))                                                      # [batch_size * news_num, max_title_length, news_embedding_dim]
+        # title_isab2 = self.dropout(self.ISAB(title_isab1))                                                  # [batch_size * news_num, max_title_length, news_embedding_dim]
+        # title_embedding = title_isab2.mean(dim=1).view([batch_news_num, self.word_embedding_dim])           # [batch_size, news_num, news_embedding_dim]
+        ## title_embedding = title_isab1.mean(dim=1).view([batch_news_num, self.word_embedding_dim])         
         
-        body_isab1 = self.dropout(self.ISAB(body_w))                                                        # [batch_size * news_num, max_title_length, news_embedding_dim]
-        body_isab2 = self.dropout(self.ISAB(body_isab1))                                                    # [batch_size * news_num, max_title_length, news_embedding_dim]
-        body_embedding = body_isab2.mean(dim=1).view([batch_news_num, self.word_embedding_dim])             # [batch_size, news_num, news_embedding_dim]
-        # body_embedding = body_isab1.mean(dim=1).view([batch_news_num, self.word_embedding_dim])          
+        # body_isab1 = self.dropout(self.ISAB(body_w))                                                        # [batch_size * news_num, max_title_length, news_embedding_dim]
+        # body_isab2 = self.dropout(self.ISAB(body_isab1))                                                    # [batch_size * news_num, max_title_length, news_embedding_dim]
+        # body_embedding = body_isab2.mean(dim=1).view([batch_news_num, self.word_embedding_dim])             # [batch_size, news_num, news_embedding_dim]
+        ## body_embedding = body_isab1.mean(dim=1).view([batch_news_num, self.word_embedding_dim])          
         
         # Word-level Attention encoding (* instead of title_t.mean(dim=1))       
         # title_embedding = self.title_attention(title_t, mask=t_mask).view([batch_size, news_num, self.news_embedding_dim])                  # [batch_size, news_num, news_embedding_dim]  
