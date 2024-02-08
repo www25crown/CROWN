@@ -26,8 +26,8 @@ class Config:
         parser = argparse.ArgumentParser(description='Neural news recommendation')
         # General config
         parser.add_argument('--mode', type=str, default='train', choices=['train', 'dev', 'test'], help='Mode')
-        parser.add_argument('--news_encoder', type=str, default='CIDER', choices=['CIDER', 'CNE', 'CNN', 'MHSA', 'KCNN', 'HDC', 'NAML', 'PNE', 'DAE', 'Inception', 'NAML_Title', 'NAML_Content', 'CNE_Title', 'CNE_Content', 'CNE_wo_CS', 'CNE_wo_CA'], help='News encoder')
-        parser.add_argument('--user_encoder', type=str, default='CIDER', choices=['CIDER', 'SUE', 'LSTUR', 'MHSA', 'ATT', 'CATT', 'FIM', 'PUE', 'GRU', 'OMAP', 'SUE_wo_GCN', 'SUE_wo_HCA'], help='User encoder')
+        parser.add_argument('--news_encoder', type=str, default='CROWN', choices=['CROWN', 'CNE', 'CNN', 'MHSA', 'KCNN', 'HDC', 'NAML', 'PNE', 'DAE', 'Inception'], help='News encoder')
+        parser.add_argument('--user_encoder', type=str, default='CROWN', choices=['CROWN', 'SUE', 'LSTUR', 'MHSA', 'ATT', 'CATT', 'FIM', 'PUE', 'GRU', 'OMAP'], help='User encoder')
         parser.add_argument('--dev_model_path', type=str, default='', help='Dev model path')
         parser.add_argument('--test_model_path', type=str, default='', help='Test model path')
         parser.add_argument('--test_output_file', type=str, default='', help='Specific test output file')
@@ -35,15 +35,15 @@ class Config:
         parser.add_argument('--seed', type=int, default=0, help='Seed for random number generator')
         parser.add_argument('--config_file', type=str, default='', help='Config file path')
         # Dataset config
-        parser.add_argument('--dataset', type=str, default='mind', choices=['mind', 'adressa'], help='Dataset type')
+        parser.add_argument('--dataset', type=str, default='adressa', choices=['mind', 'adressa'], help='Dataset type')
         parser.add_argument('--tokenizer', type=str, default='MIND', choices=['MIND', 'NLTK'], help='Sentence tokenizer')
         parser.add_argument('--word_threshold', type=int, default=3, help='Word threshold')
         parser.add_argument('--max_title_length', type=int, default=32, help='Sentence truncate length for title')
         parser.add_argument('--max_abstract_length', type=int, default=128, help='Sentence truncate length for abstract') #128
         # Training config
         parser.add_argument('--negative_sample_num', type=int, default=4, help='Negative sample number of each positive sample')
-        parser.add_argument('--max_history_num', type=int, default=40, help='Maximum number of history news for each user')
-        parser.add_argument('--epoch', type=int, default=16, help='Training epoch')
+        parser.add_argument('--max_history_num', type=int, default=50, help='Maximum number of history news for each user')
+        parser.add_argument('--epoch', type=int, default=5, help='Training epoch')
         parser.add_argument('--batch_size', type=int, default=16, help='Batch size')
         parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
         parser.add_argument('--weight_decay', type=float, default=0, help='Optimizer weight decay')
@@ -59,12 +59,12 @@ class Config:
         parser.add_argument('--head_dim', type=int, default=20, help='Head dimension of multi-head self-attention') 
         parser.add_argument('--intent_embedding_dim', type=int, default=400, choices=[100, 200, 300, 400], help='Intent embedding dimension')
         parser.add_argument('--intent_num', type=int, default=3, choices=[1, 2, 3, 4, 5], help='The number of title/body intent (k)')
-        parser.add_argument('--dropout_rate', type=float, default=0.25, help='Dropout rate')
+        parser.add_argument('--dropout_rate', type=float, default=0.2, help='Dropout rate')
         parser.add_argument('--attention_dim', type=int, default=200, help="Attention dimension")
         parser.add_argument('--word_embedding_dim', type=int, default=300, choices=[50, 100, 200, 300], help='Word embedding dimension')
         parser.add_argument('--isab_num_inds', type=int, default=2, choices=[2, 4, 6, 8, 10], help='The number of inducing points')
         parser.add_argument('--isab_num_heads', type=int, default=2, choices=[2, 4, 6, 10], help='The number of ISAB heads')
-        parser.add_argument('--alpha', type=float, default=0.1, help='Loss weight for category predictor')
+        parser.add_argument('--alpha', type=float, default=0.3, help='Loss weight for category predictor')
         
         parser.add_argument('--entity_embedding_dim', type=int, default=100, choices=[100], help='Entity embedding dimension')
         parser.add_argument('--context_embedding_dim', type=int, default=100, choices=[100], help='Context embedding dimension')
@@ -132,8 +132,8 @@ class Config:
             # self.dropout_rate = 0.2
             self.gcn_layer_num = 4
             self.intent_embedding_dim = 400
-            self.epoch = 10
-            self.dropout_rate = 0.25
+            self.epoch = 5
+            self.dropout_rate = 0.2
             # self.max_abstract_length = 128
             self.batch_size = 16
         else: 
