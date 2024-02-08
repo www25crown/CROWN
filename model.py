@@ -11,8 +11,8 @@ class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
         # For main experiments of news encoding
-        if config.news_encoder == 'CIDER':
-            self.news_encoder = newsEncoders.CIDER(config)
+        if config.news_encoder == 'CROWN':
+            self.news_encoder = newsEncoders.CROWN(config)
         elif config.news_encoder == 'CNE':
             self.news_encoder = newsEncoders.CNE(config)
         elif config.news_encoder == 'CNN':
@@ -31,25 +31,12 @@ class Model(nn.Module):
             self.news_encoder = newsEncoders.DAE(config)
         elif config.news_encoder == 'Inception':
             self.news_encoder = newsEncoders.Inception(config)
-        # For ablations of news encoding
-        # elif config.news_encoder == 'NAML_Title':
-        #     self.news_encoder = variantEncoders.NAML_Title(config)
-        # elif config.news_encoder == 'NAML_Content':
-        #     self.news_encoder = variantEncoders.NAML_Content(config)
-        # elif config.news_encoder == 'CNE_Title':
-        #     self.news_encoder = variantEncoders.CNE_Title(config)
-        # elif config.news_encoder == 'CNE_Content':
-        #     self.news_encoder = variantEncoders.CNE_Content(config)
-        # elif config.news_encoder == 'CNE_wo_CS':
-        #     self.news_encoder = variantEncoders.CNE_wo_CS(config)
-        # elif config.news_encoder == 'CNE_wo_CA':
-        #     self.news_encoder = variantEncoders.CNE_wo_CA(config)
         else:
             raise Exception(config.news_encoder + 'is not implemented')
 
         # For main experiments of user encoding
-        if config.user_encoder == 'CIDER':
-            self.user_encoder = userEncoders.CIDER(self.news_encoder, config)
+        if config.user_encoder == 'CROWN':
+            self.user_encoder = userEncoders.CROWN(self.news_encoder, config)
         elif config.user_encoder == 'SUE':
             self.user_encoder = userEncoders.SUE(self.news_encoder, config)
         elif config.user_encoder == 'LSTUR':
@@ -68,18 +55,12 @@ class Model(nn.Module):
             self.user_encoder = userEncoders.GRU(self.news_encoder, config)
         elif config.user_encoder == 'OMAP':
             self.user_encoder = userEncoders.OMAP(self.news_encoder, config)
-        # For ablations of user encoding
-        # elif config.user_encoder == 'SUE_wo_GCN':
-        #     self.user_encoder = variantEncoders.SUE_wo_GCN(self.news_encoder, config)
-        # elif config.user_encoder == 'SUE_wo_HCA':
-        #     self.user_encoder = variantEncoders.SUE_wo_HCA(self.news_encoder, config)
         else:
             raise Exception(config.user_encoder + 'is not implemented')
 
         self.model_name = config.news_encoder + '-' + config.user_encoder
         self.news_embedding_dim = self.news_encoder.news_embedding_dim
         self.dropout = nn.Dropout(p=config.dropout_rate)
-        #  user_encoder에 따라 user_embedding 다르게 setting
         if config.user_encoder == 'LSTUR':
             self.user_embedding = nn.Embedding(num_embeddings=config.user_num, embedding_dim=self.news_embedding_dim)
             self.use_user_embedding = True
