@@ -99,7 +99,7 @@ class CROWN(NewsEncoder):
         self.category_affine = nn.Linear(config.category_embedding_dim + config.subCategory_embedding_dim, config.category_embedding_dim)
         
         self.intent_num = config.intent_num     # hyperparameter k
-        self.alpha = config.alpha
+        self.beta = config.beta
         # self.title_intent_attention = ScaledDotProduct_Attention(config.intent_embedding_dim, config.category_embedding_dim, config.attention_dim)      # 230922
         self.title_intent_attention = Attention(config.intent_embedding_dim, config.attention_dim) 
         self.body_intent_attention = Attention(config.intent_embedding_dim, config.attention_dim)
@@ -651,75 +651,3 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 
-# class KnowledgePreparing(nn.Module):
-#     def __init__(self, vocab_size: int, embed_size: int, knowledge_indices, alpha: float, beta: float, dropout: float = 0.3):
-#         super().__init__()
-        
-#         common_entity_list = []
-#         with open('./pre-trained/entities_yago.dict') as common_file:
-#             while (line := common_file.readline().rstrip()):
-#                 common_entity_list.append(line.split()[1].split('_')[0].lower())
-        
-#         def yield_tokens(data_iter, tokenizer):
-#             for _, title, text in data_iter:
-#                 yield tokenizer(title)
-#                 yield tokenizer(str(text))
-        
-#         # build vocab
-#         tokenizer = get_tokenizer('basic_english')
-#         vocab = build_vocab_from_iterator(yield_tokens(train_iter, tokenizer), specials=['<unk>', '<sep>'])
-#         vocab.set_default_index(vocab['<unk>'])
-        
-#         common_lookup_indices = vocab.lookup_indices(common_entity_list)
-#         knowledge_indices['common'] = common_lookup_indices
-
-# class KnowledgeEncoding(nn.Module):
-    
-#     def __init__(self, vocab_size: int, embed_size: int, knowledge_indices, alpha: float, dropout: float = 0.3):
-#         super().__init__()
-
-#         self.alpha = alpha
-
-#         common_knowledge_path = './pre-trained/YAGO.RotatE.'
-
-#         if embed_size == 128:  
-#             common_knowledge_path += '128/entity_embedding.npy'
-#         elif embed_size == 256:
-#             common_knowledge_path += '256/entity_embedding.npy'
-#         elif embed_size == 512:
-#             common_knowledge_path += '512/entity_embedding.npy'
-#         elif embed_size == 1024:
-#             common_knowledge_path += '1024/entity_embedding.npy'
-#         else:
-#             print ('Wrong embedding dimension! Dimension should be 128, 256, 512, or 1024')
-#             sys.exit(1)
-
-#         common_pre_trained = np.load(common_knowledge_path)
-#         common_knowledge = []
-#         print('  - Reading Pre-trained Knowledge Embeddings...')
-#         for idx in range(vocab_size):
-#             mapping = 0
-#             for j, vocab_idx in enumerate(knowledge_indices['common']):
-#                 if idx != 0 and idx == vocab_idx:
-#                     common_knowledge.append(common_pre_trained[j])
-#                     mapping = 1
-#                     break
-#             if mapping == 0:
-#                 common_knowledge.append(np.zeros(embed_size))
-#             mapping = 0
-
-#         self.common_knowledge = nn.Embedding.from_pretrained(torch.FloatTensor(common_knowledge))
-
-#         self.fuse_knowledge_fc = nn.Linear(embed_size*2, embed_size)
-#         self.dropout = nn.Dropout(p=dropout)
-#         self.init_weights()
-
-#     def init_weights(self) -> None:
-#         initrange = 0.5
-#         self.fuse_knowledge_fc.weight.data.uniform_(-initrange, initrange)
-#         self.fuse_knowledge_fc.bias.data.zero_()
-
-#     def forward(self, word_embeddings: Tensor, texts: Tensor) -> Tensor:
-
-#         emb_with_ckwldg = (word_embeddings * self.alpha) + (self.common_knowledge(texts) * (1-self.alpha))
-#         return self.dropout(emb_with_ckwldg)
