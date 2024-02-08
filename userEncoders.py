@@ -38,10 +38,10 @@ class UserEncoder(nn.Module):
                 user_history_mask, user_history_graph, user_history_category_mask, user_history_category_indices, user_embedding, candidate_news_representation):
         raise Exception('Function forward must be implemented at sub-class')
 
-# Our proposed model: CIDER - user encoder
-class CIDER(UserEncoder):
+# Our proposed model: CROWN - user encoder
+class CROWN(UserEncoder):
     def __init__(self, news_encoder, config):
-        super(CIDER, self).__init__(news_encoder, config)
+        super(CROWN, self).__init__(news_encoder, config)
         
         self.attention_dim = config.attention_dim
         self.graph_sage = GraphSAGE(in_channels = self.news_embedding_dim,
@@ -49,15 +49,17 @@ class CIDER(UserEncoder):
                                     num_layers = 1,
                                     out_channels = self.news_embedding_dim,
                                     dropout = config.dropout_rate)
-
+        self.user_node_embedding = nn.Parameter(torch.zeros([config.batch_size, self.news_embedding_dim]))
         self.K = nn.Linear(self.news_embedding_dim, self.attention_dim, bias=False)
         self.Q = nn.Linear(self.news_embedding_dim, self.attention_dim, bias=True)
         self.max_history_num = config.max_history_num
         self.attention_scalar = math.sqrt(float(self.attention_dim))
         self.affine = nn.Linear(self.news_embedding_dim, self.news_embedding_dim, bias=True)
         self.dropout = nn.Dropout(p=config.dropout_rate, inplace=True)
+        self.dropout_ = nn.Dropout(p=config.dropout_rate, inplace=False)
     
     def initialize(self):
+        nn.init.zeros_(self.user_node_embedding)
         nn.init.xavier_uniform_(self.K.weight)
         nn.init.xavier_uniform_(self.Q.weight)
         nn.init.zeros_(self.Q.bias)
@@ -81,22 +83,22 @@ class CIDER(UserEncoder):
         history_embedding = self.news_encoder(user_title_text, user_title_mask, user_title_entity, \
                                               user_content_text, user_content_mask, user_content_entity, \
                                               user_category, user_subCategory, user_embedding)                  # [batch_size, max_history_num, news_embedding_dim]
-        
+        history_embedding = torch.cat([history_embedding, self.dropout_(self.user_node_embedding.unsqueeze(dim=0).expand(batch_size, -1, -1))], dim=1)      # [batch_size, max_history_num + num_users, news_embedding_dim]
+                            
         # Create user-news bipartite graph
         edge_index = self.create_bipartite_graph(user_history_mask, history_embedding.device)  
         # GNN convolution
         gcn_feature = self.graph_sage(history_embedding, edge_index)                            # [batch_size, max_history_num, news_embedding_dim]
-        user_rep1 = gcn_feature[:, :1, :].view([batch_size, self.news_embedding_dim])           # [batch_size, news_embedding_dim]
-        user_rep2 = user_rep1.unsqueeze(dim=1).expand(-1, news_num, -1)                 # [batch_size, news_num, news_embedding_dim]
+        gcn_feature = gcn_feature[:, :self.max_history_num, :] 
+        user_rep = gcn_feature[:, :1, :].view([batch_size, self.news_embedding_dim])           # [batch_size, news_embedding_dim]
+        user_rep = user_rep.unsqueeze(dim=1).expand(-1, news_num, -1)                 # [batch_size, news_num, news_embedding_dim]
                          # [batch_size, news_num, news_embedding_dim]
-        # user_representation = user_rep2
-        
+
         news_rep = gcn_feature.unsqueeze(dim=1).expand(-1, news_num, -1, -1)
-        
-        # user rep2: [batch_size, news_num, news_embedding_dim]
+
         # Attention
         K = self.K(news_rep).view([batch_news_num, self.max_history_num, self.attention_dim])            # [batch_size * news_num, max_history_num, attention_dim]
-        Q = self.Q(user_rep2).view([batch_news_num, self.attention_dim, 1])             # [batch_size * news_num, attention_dim, 1]
+        Q = self.Q(user_rep).view([batch_news_num, self.attention_dim, 1])             # [batch_size * news_num, attention_dim, 1]
         a = torch.bmm(K, Q).view([batch_news_num, self.max_history_num]) / self.attention_scalar            # [batch_size * news_num, max_history_num]
         alpha = F.softmax(a, dim=1)                                                                         # [batch_size * news_num, max_history_num]
         # input: [batch_size * news_num, 1, max_history_num]
@@ -109,7 +111,6 @@ class CIDER(UserEncoder):
         # # Apply average 
         # user_representation = gcn_feature.mean(dim=1).unsqueeze(dim=1).expand(-1, news_num, -1) # [batch_size, news_num, news_embedding_dim]
         return user_representation                                                          # [batch_size, news_num, news_embedding_dim]
-
 
 
 # Structural User Encoding(SUE)
