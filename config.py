@@ -64,7 +64,7 @@ class Config:
         parser.add_argument('--word_embedding_dim', type=int, default=300, choices=[50, 100, 200, 300], help='Word embedding dimension')
         parser.add_argument('--isab_num_inds', type=int, default=2, choices=[2, 4, 6, 8, 10], help='The number of inducing points')
         parser.add_argument('--isab_num_heads', type=int, default=2, choices=[2, 4, 6, 10], help='The number of ISAB heads')
-        parser.add_argument('--alpha', type=float, default=0.3, help='Loss weight for category predictor')
+        parser.add_argument('--beta', type=float, default=0.3, help='Loss weight for category predictor')
         
         parser.add_argument('--entity_embedding_dim', type=int, default=100, choices=[100], help='Entity embedding dimension')
         parser.add_argument('--context_embedding_dim', type=int, default=100, choices=[100], help='Context embedding dimension')
