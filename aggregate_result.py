@@ -2,6 +2,7 @@ import os
 
 
 model_dict = {
+    'CROWN-CROWN' : 'CROWN',
     'PNE-PUE': 'NPA',
     'CNN-LSTUR': 'LSTUR',
     'NAML-ATT': 'NAML',
