@@ -11,10 +11,10 @@
 | nDCG@10 | 0.4293    | 0.4309 | 0.4289   |
 
 ## Visualization of the attention weights on the disentangled intents(K=3)
-![News-newspolitics](./assets/sample_news_#1.png)
-![News-newspolitics](./assets/sample_news_#2.png)
-![Sports-football_nfl](./assets/sample_sports_#1.png)
-![Weather-weathertopstories](./assets/sample_weather_#1.png)
+![News-newspolitics](./assets/sample_news_1.png)
+![News-newspolitics](./assets/sample_news_2.png)
+![Sports-football_nfl](./assets/sample_sports_1.png)
+![Weather-weathertopstories](./assets/sample_weather_1.png)
 
 ## Datasets
 1. MIND: [**link**](https://msnews.github.io/)
