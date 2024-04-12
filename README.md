@@ -2,6 +2,7 @@
 ## The overview of CROWN
 ![The overview of CROWN](./assets/crown_overview.png)
 
+<!--
 ## The model accuracy of CROWN according to different GNN models in MIND-small
 |         | GraphSAGE | GCN    | LightGCN |
 | ------- | --------- | ------ | -------- |
@@ -17,6 +18,7 @@
 ![sports2](./assets/sample_sports_2.png)
 ![weather1](./assets/sample_weather_1.png)
 ![weather2](./assets/sample_weather_2.png)
+-->
 
 ## Datasets
 1. MIND: [**link**](https://msnews.github.io/)
