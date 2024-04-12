@@ -1,5 +1,5 @@
 ## The model accuracy of CROWN according to different GNN models in MIND-small
-|         | Baseline(AVG) | GCN     | gain  | LightGCN | gain  | GraphSAGE | gain  |
+|         | Baseline(AVG) | GCN[1]   | gain  | LightGCN[2] | gain  | GraphSAGE[3] | gain  |
 | :-------: | :-------------: | :-------: | :-----: | :--------: | :-----: | :---------: | :-----: |
 | AUC     |    0.6720     | 0.6813  | 1.38% |  0.6819  | 1.47% |  0.6823   | 1.53% |
 | MRR     |    0.3194     | 0.3348  | 4.82% |  0.3350  | 4.88% |  0.3354   | 5.01% |
@@ -7,8 +7,8 @@
 | nDCG@10 |    0.4174     | 0.4309  | 3.23% |  0.4289  | 2.76% |  0.4293   | 2.85% |
 
 ## References
-[4] Kipf, T. N., et al. "Semi-Supervised Classification with Graph Convolutional Networks." In Proceedings of the ICLR 2016.
+[1] Kipf, T. N., et al. "Semi-Supervised Classification with Graph Convolutional Networks." In Proceedings of the ICLR 2016.
 
-[5] He, X., et al. "Lightgcn: Simplifying and powering graph convolution network for recommendation." In Proceedings of the SIGIR 2020.
+[2] He, X., et al. "Lightgcn: Simplifying and powering graph convolution network for recommendation." In Proceedings of the SIGIR 2020.
 
-[6] Hamilton, W., et al. "Inductive representation learning on large graphs." In Proceedings of the NeurIPS 2017.
+[3] Hamilton, W., et al. "Inductive representation learning on large graphs." In Proceedings of the NeurIPS 2017.
