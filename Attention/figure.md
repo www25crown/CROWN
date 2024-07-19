@@ -8,3 +8,5 @@
 ![weather2](../assets/weather_2.png)
 ![health1](../assets/health_nutrition_1.png)
 ![health2](../assets/health_weightloss_2.png)
+![movies1](../assets/movies_movienews_1.png)
+![movies2](../assets/movies_movievideo_2.png)
