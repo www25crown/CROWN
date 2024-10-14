@@ -1,15 +1,15 @@
-# [KDD'25] CROWN: A Novel Approach to Comprehending Users' Preferences for Accurate Personalized News Recommendation
+# [WWW'25] CROWN: A Novel Approach to Comprehending Users' Preferences for Accurate Personalized News Recommendation
 ## The overview of CROWN
 ![The overview of CROWN](./assets/crown_overview.png)
 
 <!--
 ## The model accuracy of CROWN according to different GNN models in MIND-small
-|         | GraphSAGE | GCN    | LightGCN |
-| ------- | --------- | ------ | -------- |
-| AUC     | 0.6823    | 0.6813 | 0.6819   |
-| MRR     | 0.3354    | 0.3348 | 0.3350   |
-| nDCG@5  | 0.3697    | 0.3691 | 0.3705   |
-| nDCG@10 | 0.4293    | 0.4309 | 0.4289   |
+|         | GraphSAGE | GCN    | LightGCN |   GAT   |
+| ------- | --------- | ------ | -------- |-------- |
+| AUC     | 0.6823    | 0.6821 | 0.6846   | 0.6857  |
+| MRR     | 0.3354    | 0.3350 | 0.3380   | 0.3405  |
+| nDCG@5  | 0.3697    | 0.3692 | 0.3745   | 0.3783  |
+| nDCG@10 | 0.4293    | 0.4304 | 0.4364   | 0.4384  |
 
 ## Visualization of the attention weights on the disentangled intents(K=3)
 ![news1](./assets/sample_news_1.png)
